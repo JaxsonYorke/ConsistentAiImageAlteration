@@ -1,0 +1,22 @@
+{
+  "name": "consistentaiimagealteration",
+  "version": "1.0.0",
+  "description": "This is a script to watch a folder, and do an AI image alteration on the new image files, dropping them into a new folder",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JaxsonYorke/ConsistentAiImageAlteration.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JaxsonYorke/ConsistentAiImageAlteration/issues"
+  },
+  "homepage": "https://github.com/JaxsonYorke/ConsistentAiImageAlteration#readme"
+}
