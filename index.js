@@ -5,8 +5,8 @@ const path = require('node:path');
 const INPUT_DIR = path.resolve(process.env.INPUT_DIR || './input');
 const OUTPUT_DIR = path.resolve(process.env.OUTPUT_DIR || './output');
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash-preview-image-generation';
-const GEMINI_PROMPT = process.env.GEMINI_PROMPT || 'Alter this image with a cinematic color grade while keeping the subject and composition consistent.';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+const GEMINI_PROMPT = process.env.GEMINI_PROMPT || 'Please make this image look like it is in a Paper Mario Style';
 
 const SUPPORTED_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp']);
 const MIME_TYPES = {
@@ -154,6 +154,37 @@ async function start() {
 
   console.log(`Watching ${INPUT_DIR} for new images...`);
   console.log(`Altered images will be written to ${OUTPUT_DIR}`);
+
+  // Process any existing unprocessed images on startup
+  try {
+    console.log('Checking for unprocessed images...');
+    const inputFiles = await fsp.readdir(INPUT_DIR);
+    const outputFiles = await fsp.readdir(OUTPUT_DIR);
+    
+    const outputSet = new Set(outputFiles);
+    
+    for (const file of inputFiles) {
+      if (!isSupportedImage(file)) {
+        continue;
+      }
+      
+      const extension = path.extname(file).toLowerCase();
+      const baseName = path.basename(file, extension);
+      
+      // Check if the altered version exists in output
+      const hasAltered = Array.from(outputSet).some(outFile => {
+        return outFile.startsWith(baseName + '-altered');
+      });
+      
+      if (!hasAltered) {
+        const inputPath = path.join(INPUT_DIR, file);
+        console.log(`Found unprocessed image: ${file}`);
+        processImage(inputPath);
+      }
+    }
+  } catch (error) {
+    console.error('Error checking for unprocessed images:', error.message);
+  }
 
   fs.watch(INPUT_DIR, (eventType, filename) => {
     if (eventType !== 'rename' || !filename) {
